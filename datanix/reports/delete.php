@@ -1,0 +1,3 @@
+<?php
+require_once __DIR__.'/../includes/bootstrap.php';
+$user=require_login();$workspace=require_permission('build_dashboard');if($_SERVER['REQUEST_METHOD']!=='POST'){http_response_code(405);exit('Gunakan POST.');}verify_csrf();$id=filter_var($_POST['id']??null,FILTER_VALIDATE_INT);$st=$GLOBALS['pdo']->prepare('DELETE FROM reports WHERE id=? AND workspace_id=?');$st->execute([$id,$workspace['id']]);if($st->rowCount())audit_log('report.deleted','report',(int)$id);flash($st->rowCount()?'success':'warning',$st->rowCount()?'Report dihapus.':'Report tidak ditemukan.');redirect('reports/index.php');

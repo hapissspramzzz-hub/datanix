@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Datanix mark">
+  <defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6875ff"/><stop offset="1" stop-color="#3d48df"/></linearGradient></defs>
+  <rect width="64" height="64" rx="19" fill="url(#a)"/>
+  <path d="M20 16h10.5a16 16 0 0 1 0 32H20V16Zm8 8v16h2.4a8 8 0 1 0 0-16H28Z" fill="#fff"/>
+  <circle cx="47" cy="20" r="3" fill="#c7f5eb"/><circle cx="48" cy="44" r="3" fill="#c7f5eb"/>
+  <path d="M38 23.5 45 20M38 40.5 45 44" stroke="#c7f5eb" stroke-width="1.8" opacity=".8"/>
+</svg>
