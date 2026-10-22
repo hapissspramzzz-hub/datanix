@@ -34,6 +34,24 @@ final class DatanixAI
                 'kind' => (string) $metric['kind'],
             ];
         }
+        $diagnostic = [];
+        $allowedFactors = ['price', 'discount', 'rating', 'stock', 'margin'];
+        foreach (array_slice(is_array($facts['diagnostic'] ?? null) ? $facts['diagnostic'] : [], 0, 5) as $item) {
+            if (!is_array($item) || !in_array($item['factor'] ?? '', $allowedFactors, true)
+                || !is_numeric($item['low_performance_average'] ?? null)
+                || !is_numeric($item['high_performance_average'] ?? null)
+                || !is_numeric($item['relative_gap_percent'] ?? null)) {
+                continue;
+            }
+            $diagnostic[] = [
+                'factor' => (string) $item['factor'],
+                'low_performance_group_average' => (float) $item['low_performance_average'],
+                'high_performance_group_average' => (float) $item['high_performance_average'],
+                'higher_for_low_performers' => (bool) ($item['higher_for_low_performers'] ?? false),
+                'relative_gap_percent' => (float) $item['relative_gap_percent'],
+                'groups_with_data' => (int) ($item['groups_with_data'] ?? 0),
+            ];
+        }
         return [
             'analysis_type' => (string) ($facts['kind'] ?? 'aggregate'),
             'matched_row_count' => (int) ($facts['row_count'] ?? 0),
@@ -44,6 +62,7 @@ final class DatanixAI
                 : null,
             'measures' => $metrics,
             'has_grouped_result' => !empty($facts['table']),
+            'performance_factor_comparisons' => $diagnostic,
         ];
     }
 
@@ -86,7 +105,7 @@ final class DatanixAI
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'Anda asisten data Datanix. Anda hanya memberi penjelasan kualitatif singkat atas fakta agregat yang disediakan. Jangan mengulang angka, tanggal, persentase, mata uang, peringkat, nama dataset, nilai grup, nama kolom, atau teks PII; aplikasi menampilkan bukti itu secara lokal. Jangan mengarang hubungan sebab-akibat. Sebutkan keterbatasan jika perlu. Jawab Bahasa Indonesia, tanpa Markdown, dan output wajib JSON sesuai schema.',
+                'content' => 'Anda asisten analis data Datanix. Anda memberi penjelasan sederhana dan ringkas hanya dari fakta agregat yang disediakan. Jangan mengulang angka, tanggal, persentase, mata uang, peringkat, nama dataset, nilai grup, nama kolom, atau teks PII; aplikasi menampilkan bukti itu secara lokal. Untuk diagnosis penjualan, bandingkan hanya faktor yang tersedia pada performance_factor_comparisons dan jelaskan sebagai pola/korelasi yang mungkin terkait, bukan penyebab yang terbukti. Jangan mengarang faktor yang tidak ada pada data. Jika tidak ada faktor pembanding yang mendukung, katakan data belum cukup untuk menjelaskan alasan. Sebutkan keterbatasan jika perlu. Jawab Bahasa Indonesia, tanpa Markdown, dan output wajib JSON sesuai schema.',
             ],
             [
                 'role' => 'user',
